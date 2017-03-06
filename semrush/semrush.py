@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import logging
 import requests
 
 
@@ -154,8 +155,8 @@ class SemrushClient(object):
         else:
             raise NotImplementedError
 
-    def get_main_report(self, domain):
-        return self._call_report('domain_rank', domain=domain)
+    def get_main_report(self, domain, export_columns='Dn,Rk,Or,Ot,Oc,Ad,At,Ac'):
+        return self._call_report('domain_rank', domain=domain, export_columns=export_columns)
 
     def get_keyword_report(self, phrase):
         return self._call_report('phrase_this', phrase=phrase)
@@ -214,6 +215,10 @@ class SemrushClient(object):
             'export_escape': 1
         }
         params = universal.items() + kwargs.items()
+        logging.info(" - - - - - - - - - - - - - - - - - -- - - - - - - - - - - - - -")
+        logging.info("param= %r", params)
+        logging.info(" - - - - - - - - - - - - - - - - - -- - - - - - - - - - - - - -")
+
         response = requests.get(self.url, params=params)
 
         if response.status_code == 200:
