@@ -1,4 +1,9 @@
-#!/usr/bin/env python
+"""Python SEMrush API Wraper.
+
+API V3.0
+https://www.semrush.com/api-documentation/
+"""
+# !/usr/bin/env python
 
 import logging
 import requests
@@ -139,6 +144,11 @@ class SemrushClientException(BaseException):
 class SemrushClient(object):
 
     def __init__(self, key, database='uk'):
+        """Initialise SemrushClient.
+
+        key: The key Provide by SEMrush (https://www.semrush.com/api-use/)
+        database: A regional database.
+        """
         if not key:
             raise SemrushClientException('Valid SEMRush API key required')
 
@@ -155,36 +165,106 @@ class SemrushClient(object):
         else:
             raise NotImplementedError
 
-    def get_main_report(self, domain, export_columns='Dn,Rk,Or,Ot,Oc,Ad,At,Ac'):
-        return self._call_report('domain_rank', domain=domain, export_columns=export_columns)
+    def get_main_report(self, domain, export_columns='Dn,Rk,Or,Ot,Oc,Ad,At,Ac', display_date=None):
+        """DOMAIN OVERVIEW (ONE DATABASE): domain_rank.
+
+        This report provides live or historical data on a domain's keyword rankings
+        in both organic and paid search in a chosen regional database.
+        """
+        if display_date:
+            return self._call_report('domain_rank', domain=domain,
+                                     export_columns=export_columns, display_date=display_date)
+        else:
+            return self._call_report('domain_rank', domain=domain, export_columns=export_columns)
 
     def get_keyword_report(self, phrase):
+        """KEYWORD OVERVIEW (ONE DATABASE): phrase_this.
+
+        This report provides a summary of a keyword, including its volume, CPC, competition,
+        and the number of results in a chosen regional database.
+        """
         return self._call_report('phrase_this', phrase=phrase)
 
-    def get_organic_keywords_report(self, domain):
-        return self._call_report('domain_organic', domain=domain)
+    def get_organic_keywords_report(self, domain,
+                                    export_columns='Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tc,Co,Nr,Td',
+                                    display_date=None):
+        """DOMAIN ORGANIC SEARCH KEYWORDS: domain_organic.
 
-    def get_adwords_keyword_report(self, domain):
-        return self._call_report('domain_adwords', domain=domain)
+        This report lists keywords that bring users to a domain via Google's top 20 organic search results.
+        """
+        if display_date:
+            return self._call_report('domain_organic', domain=domain,
+                                     export_columns=export_columns, display_date=display_date)
+        else:
+            return self._call_report('domain_organic', domain=domain, export_columns=export_columns)
 
-    def get_organic_url_report(self, url):
-        return self._call_report('url_organic', url=url)
+    def get_adwords_keyword_report(self, domain,
+                                   export_columns='Ph,Po,Pp,Pd,Ab,Nq,Cp,Tr,Tc,Co,Nr,Td,Tt,Ds,Vu,Ur',
+                                   display_date=None):
+        """DOMAIN PAID SEARCH KEYWORDS: domain_adwords.
 
-    def get_adwords_url_report(self, url):
-        return self._call_report('url_adwords', url=url)
+        This report lists keywords that bring users to a domain via Google's paid search results.
+        """
+        if display_date:
+            return self._call_report('domain_adwords', domain=domain,
+                                     export_columns=export_columns, display_date=display_date)
+        else:
+            return self._call_report('domain_adwords', domain=domain, export_columns=export_columns)
 
-    def get_competitors_in_organic_search_report(self, domain):
-        return self._call_report('domain_organic_organic', domain=domain)
+    def get_organic_url_report(self, url, export_columns='Ph,Po,Nq,Cp,Co,Tr,Tc,Nr,Td', display_date=None):
+        """URL ORGANIC SEARCH KEYWORDS: url_organic.
 
-    def get_competitors_in_adwords_search_report(self, domain):
-        return self._call_report('domain_adwords_adwords', domain=domain)
+        This report lists keywords that bring users to a URL via Google's top 20 organic search results.
+        """
+        if display_date:
+            return self._call_report('url_organic', url=url, export_columns=export_columns, display_date=display_date)
+        else:
+            return self._call_report('url_organic', url=url, export_columns=export_columns)
+
+    def get_adwords_url_report(self, url, export_columns='Ph,Po,Nq,Cp,Co,Tr,Tc,Nr,Td,Tt,Ds', display_date=None):
+        """URL PAID SEARCH KEYWORDSS: url_adwords.
+
+        This report lists keywords that bring users to a URL via Google's paid search results.
+        """
+        if display_date:
+            return self._call_report('url_adwords', url=url, export_columns=export_columns, display_date=display_date)
+        else:
+            return self._call_report('url_adwords', url=url, export_columns=export_columns)
+
+    def get_competitors_in_organic_search_report(self,
+                                                 domain,
+                                                 export_columns='Dn,Cr,Np,Or,Ot,Oc,Ad',
+                                                 display_date=None):
+        """COMPETITORS IN ORGANIC SEARCH: domain_organic_organic.
+
+        This report lists a domain's competitors in organic search results.
+        """
+        if display_date:
+            return self._call_report('domain_organic_organic', domain=domain,
+                                     export_columns=export_columns, display_date=display_date)
+        else:
+            return self._call_report('domain_organic_organic', domain=domain, export_columns=export_columns)
+
+    def get_competitors_in_adwords_search_report(self,
+                                                 domain,
+                                                 export_columns='Dn,Cr,Np,Ad,At,Ac,Or',
+                                                 display_date=None):
+        """COMPETITORS IN PAID SEARCH: url_adwords.
+
+        This report lists a domain's competitors in paid search results.
+        """
+        if display_date:
+            return self._call_report('domain_adwords_adwords', domain=domain,
+                                     export_columns=export_columns, display_date=display_date)
+        else:
+            return self._call_report('domain_adwords_adwords', domain=domain, export_columns=export_columns)
 
     def get_potential_ad_traffic_buyers_report(self, domain):
-        # Deprecate on SEMrush API v3.0
+        """Deprecate on SEMrush API v3.0."""
         return self._call_report('domain_organic_adwords', domain=domain)
 
     def get_potential_ad_traffic_sellers_report(self, domain):
-        # Deprecate on SEMrush API v3.0
+        """Deprecate on SEMrush API v3.0."""
         return self._call_report('domain_adwords_organic', domain=domain)
 
     def _call_report(self, report, **kwargs):
@@ -206,12 +286,15 @@ class SemrushClient(object):
         return results
 
     def _query(self, report, **kwargs):
+        """Process the query to SEMrush.
 
+        export_escape: If this parameter uses the value "1",
+                       the report's columns will be wrapped in double quotation marks (").
+        """
         universal = {
             'database': self.database,
             'type': report,
             'key': self.key,
-            'export': 'api',
             'export_escape': 1
         }
         params = universal.items() + kwargs.items()
